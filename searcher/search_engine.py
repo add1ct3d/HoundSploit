@@ -40,7 +40,7 @@ def search_vulnerabilities_numerical(search_text, db_table):
     if db_table == 'searcher_exploit':
         return Exploit.objects.filter(Q(id__exact=int(search_text)) | Q(file__contains=search_text) | Q(description__contains=search_text) | Q(port__exact=int(search_text)))
     else:
-        return Exploit.objects.filter(Q(id__exact=int(search_text)) | Q(file__contains=search_text) | Q(description__contains=search_text))
+        return Shellcode.objects.filter(Q(id__exact=int(search_text)) | Q(file__contains=search_text) | Q(description__contains=search_text))
 
 
 def search_vulnerabilities_for_description(search_text, db_table):
