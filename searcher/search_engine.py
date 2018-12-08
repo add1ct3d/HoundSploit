@@ -1,5 +1,6 @@
 from searcher.models import Exploit, Shellcode
 import re
+from django.db.models import Q
 
 
 def search_vulnerabilities_in_db(search_text, db_table):
@@ -37,11 +38,9 @@ def search_vulnerabilities_in_db(search_text, db_table):
 
 def search_vulnerabilities_numerical(search_text, db_table):
     if db_table == 'searcher_exploit':
-        search_string = 'select * from searcher_exploit where ' + 'id = ' + search_text + ' or file like \'%' + search_text + '%\' or description like \'%' + search_text + '%\' or port = ' + search_text
-        return Exploit.objects.raw(search_string)
+        return Exploit.objects.filter(Q(id__exact=int(search_text)) | Q(file__contains=search_text) | Q(description__contains=search_text) | Q(port__exact=int(search_text)))
     else:
-        search_string = 'select * from searcher_shellcode where ' + 'id = ' + search_text + ' or file like \'%' + search_text + '%\' or description like \'%' + search_text + '\''
-        return Shellcode.objects.raw(search_string)
+        return Exploit.objects.filter(Q(id__exact=int(search_text)) | Q(file__contains=search_text) | Q(description__contains=search_text))
 
 
 def search_vulnerabilities_for_description(search_text, db_table):
