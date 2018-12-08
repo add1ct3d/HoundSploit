@@ -1,4 +1,5 @@
 from searcher.models import Exploit, Shellcode
+import re
 
 
 def search_vulnerabilities_in_db(search_text, db_table):
@@ -11,6 +12,17 @@ def search_vulnerabilities_in_db(search_text, db_table):
 
     if str(search_text).isnumeric():
         return search_vulnerabilities_numerical(search_text, db_table)
+    elif str_contains_numbers(str(search_text)):
+        # todo temporary code
+        queryset = search_vulnerabilities_for_description(search_text, db_table)
+        if len(queryset) > 0:
+            return queryset
+        else:
+            queryset = search_vulnerabilities_for_file(search_text, db_table)
+            if len(queryset) > 0:
+                return queryset
+            else:
+                return search_vulnerabilities_for_author_platform_type(search_text, db_table)
     else:
         queryset = search_vulnerabilities_for_description(search_text, db_table)
         if len(queryset) > 0:
@@ -28,7 +40,7 @@ def search_vulnerabilities_numerical(search_text, db_table):
         search_string = 'select * from searcher_exploit where ' + 'id = ' + search_text + ' or file like \'%' + search_text + '%\' or description like \'%' + search_text + '%\' or port = ' + search_text
         return Exploit.objects.raw(search_string)
     else:
-        search_string = 'select * from searcher_shellcode where ' + 'id = ' + search_text + ' or file like \'%' + search_text + '%\' or description like \'%' + search_text + '%\' or port = ' + search_text
+        search_string = 'select * from searcher_shellcode where ' + 'id = ' + search_text + ' or file like \'%' + search_text + '%\' or description like \'%' + search_text + '\''
         return Shellcode.objects.raw(search_string)
 
 
@@ -126,3 +138,7 @@ def is_valid_input(string):
         return True
     else:
         return False
+
+
+def str_contains_numbers(str):
+    return bool(re.search(r'\d', str))
