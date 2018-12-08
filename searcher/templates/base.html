@@ -10,7 +10,7 @@
         {% block icon %}
         {% endblock %}
         <h1 {% block h1_style %}{% endblock %}>HoundSploit</h1>
-        <h2>An advanced search engine for SearchSploit</h2>
+        <h2>An advanced search engine for Exploit-DB</h2>
         {% block input_form %}
             <form action="{% url 'get_results_table' %}" method="POST">
                 <input type="text" name="search_item"> <input type="submit" value="Search">
