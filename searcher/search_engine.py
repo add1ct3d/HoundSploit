@@ -53,6 +53,16 @@ def search_vulnerabilities_for_description(search_text, db_table):
         return Exploit.objects.raw(search_string)
     else:
         return Shellcode.objects.raw(search_string)
+    words_list = str(search_text).split()
+    search_string = 'select * from ' + db_table + ' where (description like \'%' + words_list[0].upper() + '%\''
+    for word in words_list[1:]:
+        search_string = search_string + ' and description like \'%' + word.upper() + '%\''
+    search_string = search_string + ')'
+    print(search_string)
+    if db_table == 'searcher_exploit':
+        return Exploit.objects.raw(search_string)
+    else:
+        return Shellcode.objects.raw(search_string)
 
 
 def search_vulnerabilities_for_file(search_text, db_table):
