@@ -214,8 +214,8 @@ def search_shellcodes_version(software_name, num_version):
                 queryset = queryset.exclude(description__exact=shellcode.description)
         else:
             try:
-                if LooseVersion(num_version) > LooseVersion(get_num_version_with_comparator(software_name, shellcode.description)):
+                if parse_version(num_version) > parse_version(get_num_version_with_comparator(software_name, shellcode.description)):
                     queryset = queryset.exclude(description__exact=shellcode.description)
-            except AttributeError:
+            except TypeError:
                 queryset = queryset.exclude(description__exact=shellcode.description)
     return queryset
