@@ -2,6 +2,7 @@ from searcher.models import Exploit, Shellcode
 import re
 from django.db.models import Q
 from distutils.version import LooseVersion
+from pkg_resources import parse_version
 
 
 def search_vulnerabilities_in_db(search_text, db_table):
@@ -136,16 +137,16 @@ def str_contains_numbers(str):
 
 
 def str_is_num_version(str):
-    return bool(re.search(r'(\d\.\d\.\d\.\d|\d\.\d\.\d|\d\.\d)', str))
+    return bool(re.search(r'(\d\.\d\.\d\.\d|\d\.\d\.\d|\d\.\d|\d)', str))
 
 
 def get_num_version(software_name, description):
     software_name = software_name.upper()
     description = description.upper()
-    regex = re.search(software_name + r' (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+)', description)
+    regex = re.search(software_name + r' (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', description)
     try:
         software = regex.group(0)
-        regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+)', software)
+        regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', software)
         try:
             return regex.group(0)
         except AttributeError:
@@ -157,10 +158,10 @@ def get_num_version(software_name, description):
 def get_num_version_with_comparator(software_name, description):
     software_name = software_name.upper()
     description = description.upper()
-    regex = re.search(software_name + r' < (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+)', description)
+    regex = re.search(software_name + r' < (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', description)
     try:
         software = regex.group(0)
-        regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+)', software)
+        regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', software)
         try:
             return regex.group(0)
         except AttributeError:
@@ -188,13 +189,16 @@ def search_exploits_version(software_name, num_version):
     queryset = Exploit.objects.filter(description__icontains=software_name)
     for exploit in queryset:
         if not str(exploit.description).__contains__('<'):
-            if num_version != get_num_version(software_name, exploit.description) or get_num_version(software_name, exploit.description) is None:
+            try:
+                if parse_version(num_version) != parse_version(get_num_version(software_name, exploit.description)):
+                    queryset = queryset.exclude(description__exact=exploit.description)
+            except TypeError:
                 queryset = queryset.exclude(description__exact=exploit.description)
         else:
             try:
-                if LooseVersion(num_version) > LooseVersion(get_num_version_with_comparator(software_name, exploit.description)):
+                if parse_version(num_version) > parse_version(get_num_version_with_comparator(software_name, exploit.description)):
                     queryset = queryset.exclude(description__exact=exploit.description)
-            except AttributeError:
+            except TypeError:
                 queryset = queryset.exclude(description__exact=exploit.description)
     return queryset
 
