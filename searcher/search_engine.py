@@ -14,7 +14,7 @@ def search_vulnerabilities_in_db(search_text, db_table):
 
     if str(search_text).isnumeric():
         return search_vulnerabilities_numerical(search_text, db_table)
-    elif str_contains_numbers(str(search_text)):
+    elif str_is_num_version(str(search_text)):
         # todo temporary code
         return search_vulnerabilities_version(search_text, db_table)
     else:
@@ -137,16 +137,16 @@ def str_contains_numbers(str):
 
 
 def str_is_num_version(str):
-    return bool(re.search(r'(\d\.\d\.\d\.\d|\d\.\d\.\d|\d\.\d|\d)', str))
+    return bool(re.search(r'(\d\.\d\.\d\.\d|\d\.\d\.\d|\d\.\d)', str))
 
 
 def get_num_version(software_name, exploit_description):
     software_name = software_name.upper()
     exploit_description = exploit_description.upper()
-    regex = re.search(software_name + r' (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', exploit_description)
+    regex = re.search(software_name + r' (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+)', exploit_description)
     try:
         software = regex.group(0)
-        regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', software)
+        regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+)', software)
         try:
             return regex.group(0)
         except AttributeError:
