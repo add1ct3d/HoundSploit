@@ -14,8 +14,7 @@ def search_vulnerabilities_in_db(search_text, db_table):
 
     if str(search_text).isnumeric():
         return search_vulnerabilities_numerical(search_text, db_table)
-    elif str_is_num_version(str(search_text)):
-        # todo temporary code
+    elif str_is_num_version(str(search_text)) and not str(search_text).__contains__('<'):
         return search_vulnerabilities_version(search_text, db_table)
     else:
         queryset = search_vulnerabilities_for_description(search_text, db_table)
@@ -140,10 +139,25 @@ def str_is_num_version(str):
     return bool(re.search(r'(\d\.\d\.\d\.\d|\d\.\d\.\d|\d\.\d)', str))
 
 
-def get_num_version(software_name, exploit_description):
+def get_num_version(software_name, description):
     software_name = software_name.upper()
-    exploit_description = exploit_description.upper()
-    regex = re.search(software_name + r' (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+)', exploit_description)
+    description = description.upper()
+    regex = re.search(software_name + r' (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+)', description)
+    try:
+        software = regex.group(0)
+        regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+)', software)
+        try:
+            return regex.group(0)
+        except AttributeError:
+            return
+    except AttributeError:
+        return
+
+
+def get_num_version_with_comparator(software_name, description):
+    software_name = software_name.upper()
+    description = description.upper()
+    regex = re.search(software_name + r' < (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+)', description)
     try:
         software = regex.group(0)
         regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+)', software)
@@ -175,10 +189,13 @@ def search_exploits_version(software_name, num_version):
     for exploit in queryset:
         if not str(exploit.description).__contains__('<'):
             if num_version != get_num_version(software_name, exploit.description) or get_num_version(software_name, exploit.description) is None:
-                print(get_num_version(software_name, exploit.description))
                 queryset = queryset.exclude(description__exact=exploit.description)
         else:
-            queryset = queryset.exclude(description__exact=exploit.description)
+            try:
+                if LooseVersion(num_version) > LooseVersion(get_num_version_with_comparator(software_name, exploit.description)):
+                    queryset = queryset.exclude(description__exact=exploit.description)
+            except AttributeError:
+                queryset = queryset.exclude(description__exact=exploit.description)
     return queryset
 
 
@@ -190,5 +207,9 @@ def search_shellcodes_version(software_name, num_version):
                 print(get_num_version(software_name, shellcode.description))
                 queryset = queryset.exclude(description__exact=shellcode.description)
         else:
-            queryset = queryset.exclude(description__exact=shellcode.description)
+            try:
+                if LooseVersion(num_version) > LooseVersion(get_num_version_with_comparator(software_name, shellcode.description)):
+                    queryset = queryset.exclude(description__exact=shellcode.description)
+            except AttributeError:
+                queryset = queryset.exclude(description__exact=shellcode.description)
     return queryset
