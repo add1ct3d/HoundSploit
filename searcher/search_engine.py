@@ -207,8 +207,10 @@ def search_shellcodes_version(software_name, num_version):
     queryset = Shellcode.objects.filter(description__icontains=software_name)
     for shellcode in queryset:
         if not str(shellcode.description).__contains__('<'):
-            if num_version != get_num_version(software_name, shellcode.description) or get_num_version(software_name, shellcode.description) is None:
-                print(get_num_version(software_name, shellcode.description))
+            try:
+                if parse_version(num_version) != parse_version(get_num_version(software_name, shellcode.description)):
+                    queryset = queryset.exclude(description__exact=shellcode.description)
+            except TypeError:
                 queryset = queryset.exclude(description__exact=shellcode.description)
         else:
             try:
