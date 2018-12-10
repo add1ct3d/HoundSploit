@@ -1,6 +1,7 @@
 from searcher.models import Exploit, Shellcode
 import re
 from django.db.models import Q
+from distutils.version import LooseVersion
 
 
 def search_vulnerabilities_in_db(search_text, db_table):
@@ -15,15 +16,7 @@ def search_vulnerabilities_in_db(search_text, db_table):
         return search_vulnerabilities_numerical(search_text, db_table)
     elif str_contains_numbers(str(search_text)):
         # todo temporary code
-        queryset = search_vulnerabilities_for_description(search_text, db_table)
-        if len(queryset) > 0:
-            return queryset
-        else:
-            queryset = search_vulnerabilities_for_file(search_text, db_table)
-            if len(queryset) > 0:
-                return queryset
-            else:
-                return search_vulnerabilities_for_author_platform_type(search_text, db_table)
+        return search_vulnerabilities_version(search_text, db_table)
     else:
         queryset = search_vulnerabilities_for_description(search_text, db_table)
         if len(queryset) > 0:
@@ -141,3 +134,61 @@ def is_valid_input(string):
 
 def str_contains_numbers(str):
     return bool(re.search(r'\d', str))
+
+
+def str_is_num_version(str):
+    return bool(re.search(r'(\d\.\d\.\d\.\d|\d\.\d\.\d|\d\.\d|\d)', str))
+
+
+def get_num_version(software_name, exploit_description):
+    software_name = software_name.upper()
+    exploit_description = exploit_description.upper()
+    regex = re.search(software_name + r' (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', exploit_description)
+    try:
+        software = regex.group(0)
+        regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', software)
+        try:
+            return regex.group(0)
+        except AttributeError:
+            return
+    except AttributeError:
+        return
+
+
+def search_vulnerabilities_version(search_text, db_table):
+    words = str(search_text).upper().split()
+    software_name = words[0]
+    for word in words[1:]:
+        if not str_is_num_version(word):
+            software_name = software_name + ' ' + word
+        else:
+            num_version = word
+    # print(software_name, num_version)
+    if db_table == 'searcher_exploit':
+        return search_exploits_version(software_name, num_version)
+    else:
+        return search_shellcodes_version(software_name, num_version)
+
+
+def search_exploits_version(software_name, num_version):
+    queryset = Exploit.objects.filter(description__icontains=software_name)
+    for exploit in queryset:
+        if not str(exploit.description).__contains__('<'):
+            if num_version != get_num_version(software_name, exploit.description) or get_num_version(software_name, exploit.description) is None:
+                print(get_num_version(software_name, exploit.description))
+                queryset = queryset.exclude(description__exact=exploit.description)
+        else:
+            queryset = queryset.exclude(description__exact=exploit.description)
+    return queryset
+
+
+def search_shellcodes_version(software_name, num_version):
+    queryset = Shellcode.objects.filter(description__icontains=software_name)
+    for shellcode in queryset:
+        if not str(shellcode.description).__contains__('<'):
+            if num_version != get_num_version(software_name, shellcode.description) or get_num_version(software_name, shellcode.description) is None:
+                print(get_num_version(software_name, shellcode.description))
+                queryset = queryset.exclude(description__exact=shellcode.description)
+        else:
+            queryset = queryset.exclude(description__exact=shellcode.description)
+    return queryset
