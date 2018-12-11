@@ -11,8 +11,8 @@
         <a name="top"></a>
         <div class="navbar">
             <a class="home_item" href="/searcher">HoundSploit</a>
-            <a href="{% url 'show_info' %}">Help</a>
-            <a href="{% url 'show_help' %}">About</a>
+            <a href="{% url 'show_help' %}">Help</a>
+            <a href="{% url 'show_info' %}">About</a>
         </div>
         {% block icon %}
         {% endblock %}
@@ -23,6 +23,8 @@
         {% block results_form %}
         {% endblock %}
         {% block code_viewer %}
+        {% endblock %}
+        {% block about %}
         {% endblock %}
         <footer>
             <p>HoundSploit &nbsp;&nbsp; Developed by Nicolas Carolo &nbsp;&nbsp; <a href="https://github.com/nicolas-carolo/HoundSploit">GitHub page of the project</a></p>
