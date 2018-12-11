@@ -1,7 +1,6 @@
 from searcher.models import Exploit, Shellcode
 import re
 from django.db.models import Q
-from distutils.version import LooseVersion
 from pkg_resources import parse_version
 
 
