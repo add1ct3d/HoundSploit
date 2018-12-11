@@ -53,10 +53,10 @@ def view_shellcode_code(request, shellcode_id):
     shellcode_type = shellcode.vulnerability_type
     shellcode_platform = shellcode.platform
     pwd = os.path.dirname(__file__)
-    file = open(pwd + '/static/vulnerability/' + shellcode.file, 'r')
-    vulnerability_code = ''
-    for line in file:
-        vulnerability_code = vulnerability_code + line
+    with open(pwd + '/static/vulnerability/' + shellcode.file, 'r') as f:
+        content = f.readlines()
+        vulnerability_code = ''.join(content)
+
     return render(request, 'code_viewer.html', {'vulnerability_code': vulnerability_code,
                                                 'vulnerability_description': shellcode_description,
                                                 'vulnerability_file': shellcode_file,
