@@ -4,23 +4,21 @@
         <meta charset="UTF-8">
         <title>HoundSploit</title>
         <link href="/static/base.css" rel="stylesheet">
+        {% block important_scripts %}
+        {% endblock %}
     </head>
     <body>
         <a name="top"></a>
         <div class="navbar">
             <a class="home_item" href="/searcher">HoundSploit</a>
-            <a href="#">Help</a>
-            <a href="#">About</a>
+            <a href="{% url 'show_info' %}">Help</a>
+            <a href="{% url 'show_help' %}">About</a>
         </div>
         {% block icon %}
         {% endblock %}
         <h1 {% block h1_style %}{% endblock %}>HoundSploit</h1>
         <h2>An advanced search engine for Exploit-DB</h2>
         {% block input_form %}
-            <form action="{% url 'get_results_table' %}" method="POST">
-                <input type="text" name="search_item"> <input type="submit" value="Search">
-                {% csrf_token %}
-            </form>
         {% endblock %}
         {% block results_form %}
         {% endblock %}

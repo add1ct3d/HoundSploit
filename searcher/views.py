@@ -67,4 +67,12 @@ def view_shellcode_code(request, shellcode_id):
                                                 })
 
 
+def show_help(request):
+    return render(request, 'help.html')
+
+
+def show_info(request):
+    return render(request, 'about.html')
+
+
 
