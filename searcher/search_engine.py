@@ -37,19 +37,21 @@ def search_vulnerabilities_numerical(search_text, db_table):
 
 def search_vulnerabilities_for_description(search_text, db_table):
     words_list = str(search_text).split()
+    search_string = 'select * from ' + db_table + ' where (description like \'%' + words_list[0].upper() + '%\''
+    for word in words_list[1:]:
+        search_string = search_string + ' and description like \'%' + word.upper() + '%\''
+    search_string = search_string + ') or ((id like \'%' + words_list[0].upper() + '%\''
+    for word in words_list[1:]:
+        search_string = search_string + ' or id like \'%' + word.upper() + '%\''
+    search_string = search_string + ') and (description like \'%' + words_list[0].upper() + '%\''
+    for word in words_list[1:]:
+        search_string = search_string + ' or description like \'%' + word.upper() + '%\''
+    search_string = search_string + '))'
+    print(search_string)
     if db_table == 'searcher_exploit':
-        queryset = Exploit.objects.filter(description__icontains=words_list[0])
-        for word in words_list[1:]:
-            for exploit in queryset:
-                if not exploit.description.__contains__(word):
-                    queryset = queryset.exclude(id=exploit.id)
+        return Exploit.objects.raw(search_string)
     else:
-        queryset = Shellcode.objects.filter(description__icontains=words_list[0])
-        for word in words_list[1:]:
-            for shellcode in queryset:
-                if not shellcode.description.__contains__(word):
-                    queryset = queryset.exclude(id=shellcode.id)
-    return queryset
+        return Shellcode.objects.raw(search_string)
 
 
 def search_vulnerabilities_for_file(search_text, db_table):
@@ -137,6 +139,10 @@ def str_is_num_version(str):
     return bool(re.search(r'(\d\.\d\.\d\.\d|\d\.\d\.\d|\d\.\d|\d)', str))
 
 
+def str_contains_num_version_range(str):
+    return bool(re.search(r'(\d\.\d\.\d\.\d|\d\.\d\.\d|\d\.\d|\d) < (\d\.\d\.\d\.\d|\d\.\d\.\d|\d\.\d|\d)', str))
+
+
 def get_num_version(software_name, description):
     software_name = software_name.upper()
     description = description.upper()
@@ -167,6 +173,21 @@ def get_num_version_with_comparator(software_name, description):
         return
 
 
+def is_in_version_range(num_version, software_name, description):
+    software_name = software_name.upper()
+    description = description.upper()
+    regex = re.search(software_name + r' (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+) < (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', description)
+    try:
+        software = regex.group(0)
+        regex = re.search(r'(?P<from_version>(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)) < (?P<to_version>(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+))', software)
+        if parse_version(num_version) >= parse_version(regex.group('from_version')) and parse_version(num_version) <= parse_version(regex.group('to_version')):
+            return True
+        else:
+            return False
+    except AttributeError:
+        return False
+
+
 def search_vulnerabilities_version(search_text, db_table):
     words = str(search_text).upper().split()
     software_name = words[0]
@@ -192,11 +213,15 @@ def search_exploits_version(software_name, num_version):
             except TypeError:
                 queryset = queryset.exclude(description__exact=exploit.description)
         else:
-            try:
-                if parse_version(num_version) > parse_version(get_num_version_with_comparator(software_name, exploit.description)):
+            if str_contains_num_version_range(str(exploit.description)):
+                if not is_in_version_range(num_version, software_name, exploit.description):
                     queryset = queryset.exclude(description__exact=exploit.description)
-            except TypeError:
-                queryset = queryset.exclude(description__exact=exploit.description)
+            else:
+                try:
+                    if parse_version(num_version) > parse_version(get_num_version_with_comparator(software_name, exploit.description)):
+                        queryset = queryset.exclude(description__exact=exploit.description)
+                except TypeError:
+                    queryset = queryset.exclude(description__exact=exploit.description)
     return queryset
 
 
