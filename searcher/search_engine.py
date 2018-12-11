@@ -235,9 +235,13 @@ def search_shellcodes_version(software_name, num_version):
             except TypeError:
                 queryset = queryset.exclude(description__exact=shellcode.description)
         else:
-            try:
-                if parse_version(num_version) > parse_version(get_num_version_with_comparator(software_name, shellcode.description)):
+            if str_contains_num_version_range(str(shellcode.description)):
+                if not is_in_version_range(num_version, software_name, shellcode.description):
                     queryset = queryset.exclude(description__exact=shellcode.description)
-            except TypeError:
-                queryset = queryset.exclude(description__exact=shellcode.description)
+            else:
+                try:
+                    if parse_version(num_version) > parse_version(get_num_version_with_comparator(software_name, shellcode.description)):
+                        queryset = queryset.exclude(description__exact=shellcode.description)
+                except TypeError:
+                    queryset = queryset.exclude(description__exact=shellcode.description)
     return queryset
