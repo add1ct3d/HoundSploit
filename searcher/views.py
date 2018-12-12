@@ -29,10 +29,10 @@ def view_exploit_code(request, exploit_id):
     exploit_port = exploit.port
 
     pwd = os.path.dirname(__file__)
-    file = open(pwd + '/static/vulnerability/' + exploit.file, 'r')
-    vulnerability_code = ''
-    for line in file:
-        vulnerability_code = vulnerability_code + line
+    file_path = '/static/vulnerability/' + exploit.file
+    with open(pwd + '/static/vulnerability/' + exploit.file, 'r') as f:
+        content = f.readlines()
+        vulnerability_code = ''.join(content)
     return render(request, 'code_viewer.html', {'vulnerability_code': vulnerability_code,
                                                 'vulnerability_description': exploit_description,
                                                 'vulnerability_file': exploit_file,
@@ -40,7 +40,8 @@ def view_exploit_code(request, exploit_id):
                                                 'vulnerability_date': exploit_date,
                                                 'vulnerability_type': exploit_type,
                                                 'vulnerability_platform': exploit_platform,
-                                                'vulnerability_port': exploit_port
+                                                'vulnerability_port': exploit_port,
+                                                'file_path': file_path,
                                                 })
 
 
@@ -53,6 +54,7 @@ def view_shellcode_code(request, shellcode_id):
     shellcode_type = shellcode.vulnerability_type
     shellcode_platform = shellcode.platform
     pwd = os.path.dirname(__file__)
+    file_path = '/static/vulnerability/' + shellcode.file
     with open(pwd + '/static/vulnerability/' + shellcode.file, 'r') as f:
         content = f.readlines()
         vulnerability_code = ''.join(content)
@@ -64,6 +66,7 @@ def view_shellcode_code(request, shellcode_id):
                                                 'vulnerability_date': shellcode_date,
                                                 'vulnerability_type': shellcode_type,
                                                 'vulnerability_platform': shellcode_platform,
+                                                'file_path': file_path,
                                                 })
 
 

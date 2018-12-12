@@ -14,6 +14,7 @@
            <p class="vulnerability_info_bold">Port: </p><p class="vulnerability_info">{{ vulnerability_port }}</p><br>
         {% endif %}
     </div>
+    <a href="{{ file_path }}" download="{{ vulnerability_description }}.txt"><button>Download the source code</button></a>
     <div class="code-container">
         <pre class="prettyprint linenums:1">{{ vulnerability_code }}</pre>
     </div>
