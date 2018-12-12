@@ -3,6 +3,7 @@ from searcher.search_engine import search_vulnerabilities_in_db
 from searcher.search_engine import is_valid_input
 from searcher.models import Exploit, Shellcode
 import os
+import re
 
 
 def get_results_table(request):
@@ -42,6 +43,7 @@ def view_exploit_code(request, exploit_id):
                                                 'vulnerability_platform': exploit_platform,
                                                 'vulnerability_port': exploit_port,
                                                 'file_path': file_path,
+                                                'file_name': exploit_description + get_vulnerability_extension(exploit_file),
                                                 })
 
 
@@ -67,6 +69,7 @@ def view_shellcode_code(request, shellcode_id):
                                                 'vulnerability_type': shellcode_type,
                                                 'vulnerability_platform': shellcode_platform,
                                                 'file_path': file_path,
+                                                'file_name': shellcode_description + get_vulnerability_extension(shellcode_file),
                                                 })
 
 
@@ -76,6 +79,13 @@ def show_help(request):
 
 def show_info(request):
     return render(request, 'about.html')
+
+
+def get_vulnerability_extension(vulnerability_file):
+    regex = re.search(r'\.(?P<extension>\w+)', vulnerability_file)
+    extension = '.' + regex.group('extension')
+    return extension
+
 
 
 

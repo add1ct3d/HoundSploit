@@ -236,9 +236,9 @@ div.info_container {
 }
 
 .vulnerability_info button{
-    width: 30%;
+    width: 20%;
     padding: auto;
-    font-size: 16px;
+    font-size: 20px;
 }
 
 .info_container p {
@@ -249,5 +249,5 @@ div.info_container {
 div[name=download_button_container] {
     text-align: center;
     width: 100%;
-    margin: 10px auto auto;
+    margin: 20px auto auto;
 }
