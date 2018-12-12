@@ -181,6 +181,7 @@ div.vulnerability_info {
     background-color: #EEEEEE;
     padding: 15px;
     border-radius: 20px;
+    align-content: center;
 }
 
 p.vulnerability_info {
@@ -234,7 +235,19 @@ div.info_container {
     border-radius: 20px;
 }
 
+.vulnerability_info button{
+    width: 30%;
+    padding: auto;
+    font-size: 16px;
+}
+
 .info_container p {
     text-align: center;
     font-size: 18px;
+}
+
+div[name=download_button_container] {
+    text-align: center;
+    width: 100%;
+    margin: 10px auto auto;
 }
