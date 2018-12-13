@@ -1,6 +1,8 @@
+from functools import reduce
 from searcher.models import Exploit, Shellcode
 import re
 from django.db.models import Q
+import operator
 from pkg_resources import parse_version
 
 
@@ -36,22 +38,14 @@ def search_vulnerabilities_numerical(search_text, db_table):
 
 
 def search_vulnerabilities_for_description(search_text, db_table):
+    # I have installed reduce
     words_list = str(search_text).split()
-    search_string = 'select * from ' + db_table + ' where (description like \'%' + words_list[0].upper() + '%\''
-    for word in words_list[1:]:
-        search_string = search_string + ' and description like \'%' + word.upper() + '%\''
-    search_string = search_string + ') or ((id like \'%' + words_list[0].upper() + '%\''
-    for word in words_list[1:]:
-        search_string = search_string + ' or id like \'%' + word.upper() + '%\''
-    search_string = search_string + ') and (description like \'%' + words_list[0].upper() + '%\''
-    for word in words_list[1:]:
-        search_string = search_string + ' or description like \'%' + word.upper() + '%\''
-    search_string = search_string + '))'
-    print(search_string)
+    query = reduce(operator.and_, (Q(description__contains=word) for word in words_list))
     if db_table == 'searcher_exploit':
-        return Exploit.objects.raw(search_string)
+        queryset = Exploit.objects.filter(query)
     else:
-        return Shellcode.objects.raw(search_string)
+        queryset = Shellcode.objects.filter(query)
+    return queryset
 
 
 def search_vulnerabilities_for_file(search_text, db_table):
