@@ -51,7 +51,7 @@ def search_vulnerabilities_for_description(search_text, db_table):
 
 def search_vulnerabilities_for_file(search_text, db_table):
     words_list = str(search_text).split()
-    query = reduce(operator.or_, (Q(file__contains=word) for word in words_list))
+    query = reduce(operator.or_, (Q(file__icontains=word) for word in words_list))
     if db_table == 'searcher_exploit':
         queryset = Exploit.objects.filter(query)
     else:
