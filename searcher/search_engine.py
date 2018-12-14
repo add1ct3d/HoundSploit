@@ -16,8 +16,7 @@ def search_vulnerabilities_in_db(search_text, db_table):
 
     if str(search_text).isnumeric():
         return search_vulnerabilities_numerical(search_text, db_table)
-    # todo fix the bug in str_is_num_version
-    elif str_is_num_version(str(search_text)) and not str(search_text).__contains__('<'):
+    elif str_is_num_version(str(search_text)) and str(search_text).__contains__(' ') and not str(search_text).__contains__('<'):
         return search_vulnerabilities_version(search_text, db_table)
     else:
         queryset = search_vulnerabilities_for_description(search_text, db_table)
@@ -69,6 +68,7 @@ def search_vulnerabilities_for_author(search_text, db_table):
     return queryset
 
 
+# todo this method will be replaced with advanced searcher
 def search_exploits_exact(words):
     accepted_fileds = ['FILE', 'DESCRIPTION', 'AUTHOR', 'TYPE', 'PLATFORM', 'PORT']
     search_string = words[0]
@@ -90,6 +90,7 @@ def search_exploits_exact(words):
                 return Exploit.objects.raw('select * from searcher_exploit where ' + words[words_index + 1] + ' like \'%' + search_string.upper() + '%\'')
 
 
+# todo this method will be replaced with advanced searcher
 def search_shellcodes_exact(words):
     accepted_fileds = ['FILE', 'DESCRIPTION', 'AUTHOR', 'TYPE', 'PLATFORM']
     search_string = words[0]
