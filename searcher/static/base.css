@@ -183,6 +183,7 @@ div.vulnerability_info {
     padding: 15px;
     border-radius: 20px;
     align-content: center;
+    box-shadow: 5px 5px 5px #EEEEEE;
 }
 
 p.vulnerability_info {
@@ -234,6 +235,7 @@ div.info_container {
     background-color: #EEEEEE;
     padding: 15px;
     border-radius: 20px;
+    box-shadow: 5px 5px 5px #EEEEEE;
 }
 
 .vulnerability_info button{
@@ -251,4 +253,28 @@ div[name=download_button_container] {
     text-align: center;
     width: 100%;
     margin: 20px auto auto;
+}
+
+div[name=filters_container] {
+    width: 40%;
+    margin: 0 auto;
+    border: 1px solid #DDDDDD;
+    background-color: #EEEEEE;
+    padding: 15px;
+    border-radius: 20px;
+    box-shadow: 5px 5px 5px #EEEEEE;
+}
+
+option {
+    background-color: white;
+    color: black;
+}
+
+select {
+    background-color: white;
+    color: black;
+    border-radius: 10px;
+    border-color: #EEEEEE;
+    border-bottom-color: #EEEEEE;
+    padding: 2px;
 }

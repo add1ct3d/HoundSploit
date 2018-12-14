@@ -72,5 +72,19 @@ def get_vulnerability_extension(vulnerability_file):
     return extension
 
 
+def show_advanced_search(request):
+    # todo alphabetic order and remove repetitions
+    exploit_type_items = Exploit.objects.order_by().values('vulnerability_type').distinct().exclude(vulnerability_type__exact='')
+    shellcode_type_items = Shellcode.objects.order_by().values('vulnerability_type').distinct().exclude(vulnerability_type__exact='')
+    exploit_platform_items = Exploit.objects.order_by().values('platform').distinct().exclude(platform__exact='')
+    shellcode_platform_items = Shellcode.objects.order_by().values('platform').distinct().exclude(platform__exact='')
+    exploit_port_items = Exploit.objects.order_by().values('port').distinct().exclude(port__exact='')
+    return render(request, 'advanced_searcher.html', {'exploit_type_items': exploit_type_items,
+                                                      'shellcode_type_items': shellcode_type_items,
+                                                      'exploit_platform_items': exploit_platform_items,
+                                                      'shellcode_platform_items': shellcode_platform_items,
+                                                      'exploit_port_items': exploit_port_items})
+
+
 
 

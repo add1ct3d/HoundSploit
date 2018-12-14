@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block icon %}
+    <img src="/static/media/hound.png" alt="HoundSploit">
+{% endblock %}
+{% block h1_style %}style="margin-top: 10px"{% endblock %}
+{% block input_form %}
+    <form action="{% url 'get_results_table' %}" method="POST">
+        <input type="text" name="search_item"> <input type="submit" value="Search">
+        <div name="filters_container">
+            <label>Description</label>
+            <select name=”description_operand_combo”>
+	            <option value=”and”>AND</option>
+	            <option value=”or”>OR</option>
+            </select>
+            <label>Type</label>
+            <select name=”type_combo”>
+                <option value=”all”>All</option>
+	            {% for item in exploit_type_items %}
+                    <option value=”{{ item.vulnerability_type }}”>{{ item.vulnerability_type }}</option>
+                {% endfor %}
+                {% for item in shellcode_type_items %}
+                    <option value=”{{ item.vulnerability_type }}”>{{ item.vulnerability_type }}</option>
+                {% endfor %}
+            </select>
+            <label>Platform</label>
+            <select name=”platform_combo”>
+                <option value=”all”>All</option>
+	            {% for item in exploit_platform_items %}
+                    <option value=”{{ item.platform }}”>{{ item.platform }}</option>
+                {% endfor %}
+                {% for item in shellcode_platform_items %}
+                    <option value=”{{ item.platform }}”>{{ item.platform }}</option>
+                {% endfor %}
+            </select>
+            <label>Port</label>
+            <select name=”port_combo”>
+                <option value=”all”>All</option>
+                <option value=”none”>None</option>
+	            {% for item in exploit_port_items %}
+                    <option value=”{{ item.port }}”>{{ item.port }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% csrf_token %}
+    </form>
+{% endblock %}
