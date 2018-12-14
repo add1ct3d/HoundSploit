@@ -28,7 +28,7 @@ def search_vulnerabilities_in_db(search_text, db_table):
             if len(queryset) > 0:
                 return queryset
             else:
-                return search_vulnerabilities_for_author_platform_type(search_text, db_table)
+                return search_vulnerabilities_for_author(search_text, db_table)
 
 
 def search_vulnerabilities_numerical(search_text, db_table):
@@ -41,7 +41,7 @@ def search_vulnerabilities_numerical(search_text, db_table):
 def search_vulnerabilities_for_description(search_text, db_table):
     # I have installed reduce
     words_list = str(search_text).split()
-    query = reduce(operator.and_, (Q(description__contains=word) for word in words_list))
+    query = reduce(operator.and_, (Q(description__icontains=word) for word in words_list))
     if db_table == 'searcher_exploit':
         queryset = Exploit.objects.filter(query)
     else:
@@ -59,23 +59,14 @@ def search_vulnerabilities_for_file(search_text, db_table):
     return queryset
 
 
-def search_vulnerabilities_for_author_platform_type(search_text, db_table):
+def search_vulnerabilities_for_author(search_text, db_table):
     words_list = str(search_text).split()
-    search_string = 'select * from ' + db_table + ' where (author like \'%' + words_list[0].upper() + '%\''
-    for word in words_list[1:]:
-        search_string = search_string + ' or author like \'%' + word.upper() + '%\''
-    search_string = search_string + ') or (platform like \'%' + words_list[0].upper() + '%\''
-    for word in words_list[1:]:
-        search_string = search_string + ' or platform like \'%' + word.upper() + '%\''
-    search_string = search_string + ') or (vulnerability_type like \'%' + words_list[0].upper() + '%\''
-    for word in words_list[1:]:
-        search_string = search_string + ' or platform like \'%' + word.upper() + '%\''
-    search_string = search_string + ')'
-    print(search_string)
+    query = reduce(operator.and_, (Q(author__icontains=word) for word in words_list))
     if db_table == 'searcher_exploit':
-        return Exploit.objects.raw(search_string)
+        queryset = Exploit.objects.filter(query)
     else:
-        return Shellcode.objects.raw(search_string)
+        queryset = Shellcode.objects.filter(query)
+    return queryset
 
 
 def search_exploits_exact(words):
