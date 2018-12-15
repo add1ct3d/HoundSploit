@@ -22,7 +22,8 @@ def search_vulnerabilities_in_db(search_text, db_table):
             if len(queryset) > 0:
                 return highlight_keywords_in_file(words, queryset)
             else:
-                return search_vulnerabilities_for_author(search_text, db_table)
+                queryset = search_vulnerabilities_for_author(search_text, db_table)
+                return highlight_keywords_in_author(words, queryset)
 
 
 def search_vulnerabilities_numerical(search_text, db_table):
@@ -203,4 +204,14 @@ def highlight_keywords_in_file(keywords_list, queryset):
             if file.__contains__(keyword):
                 regex = re.compile(re.escape(keyword), re.IGNORECASE)
                 vulnerability.file = regex.sub('<span>' + keyword + '</span>', vulnerability.file)
+    return queryset
+
+
+def highlight_keywords_in_author(keywords_list, queryset):
+    for vulnerability in queryset:
+        for keyword in keywords_list:
+            file = str(vulnerability.author).upper()
+            if file.__contains__(keyword):
+                regex = re.compile(re.escape(keyword), re.IGNORECASE)
+                vulnerability.author = regex.sub('<span>' + keyword + '</span>', vulnerability.author)
     return queryset

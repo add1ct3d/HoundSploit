@@ -20,7 +20,7 @@
                         <td>{% autoescape off %}{{ res.file }}{% endautoescape %}</td>
                         <td>{% autoescape off %}{{ res.description }}{% endautoescape %}</td>
                         <td>{{ res.date }}</td>
-                        <td>{{ res.author }}</td>
+                        <td>{% autoescape off %}{{ res.author }}{% endautoescape %}</td>
                         <td>{{ res.vulnerability_type }}</td>
                         <td>{{ res.platform }}</td>
                         <td>{{ res.port }}</td>
@@ -46,7 +46,7 @@
                         <td>{% autoescape off %}{{ res.file }}{% endautoescape %}</td>
                         <td>{% autoescape off %}{{ res.description }}{% endautoescape %}</td>
                         <td>{{ res.date }}</td>
-                        <td>{{ res.author }}</td>
+                        <td>{% autoescape off %}{{ res.author }}{% endautoescape %}</td>
                         <td>{{ res.vulnerability_type }}</td>
                         <td>{{ res.platform }}</td>
                         <td><a href="/searcher/shellcode_view/{{ res.id }}"><button type="button">Inspect code</button></a></td>
