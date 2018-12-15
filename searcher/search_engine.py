@@ -17,11 +17,12 @@ def search_vulnerabilities_in_db(search_text, db_table):
     if str(search_text).isnumeric():
         return search_vulnerabilities_numerical(search_text, db_table)
     elif str_is_num_version(str(search_text)) and str(search_text).__contains__(' ') and not str(search_text).__contains__('<'):
-        return search_vulnerabilities_version(search_text, db_table)
+        queryset = search_vulnerabilities_version(search_text, db_table)
+        return highlight_keywords_in_description(words, queryset)
     else:
         queryset = search_vulnerabilities_for_description(search_text, db_table)
         if len(queryset) > 0:
-            return queryset
+            return highlight_keywords_in_description(words, queryset)
         else:
             queryset = search_vulnerabilities_for_file(search_text, db_table)
             if len(queryset) > 0:
@@ -228,4 +229,14 @@ def search_shellcodes_version(software_name, num_version):
                         queryset = queryset.exclude(description__exact=shellcode.description)
                 except TypeError:
                     queryset = queryset.exclude(description__exact=shellcode.description)
+    return queryset
+
+
+def highlight_keywords_in_description(keywords_list, queryset):
+    for vulnerability in queryset:
+        for keyword in keywords_list:
+            description = str(vulnerability.description).upper()
+            if description.__contains__(keyword):
+                insensitive_hippo = re.compile(re.escape(keyword), re.IGNORECASE)
+                vulnerability.description = insensitive_hippo.sub('<span>' + keyword + '</span>', vulnerability.description)
     return queryset

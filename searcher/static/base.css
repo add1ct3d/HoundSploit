@@ -278,3 +278,8 @@ select {
     border-bottom-color: #EEEEEE;
     padding: 2px;
 }
+
+span {
+    color: red;
+    font-weight: bold;
+}
