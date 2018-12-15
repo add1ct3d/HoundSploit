@@ -17,7 +17,7 @@
                 </tr>
                 {% for res in exploits_results %}
                     <tr>
-                        <td>{{ res.file }}</td>
+                        <td>{% autoescape off %}{{ res.file }}{% endautoescape %}</td>
                         <td>{% autoescape off %}{{ res.description }}{% endautoescape %}</td>
                         <td>{{ res.date }}</td>
                         <td>{{ res.author }}</td>
@@ -43,7 +43,7 @@
                 </tr>
                 {% for res in shellcodes_results %}
                     <tr>
-                        <td>{{ res.file }}</td>
+                        <td>{% autoescape off %}{{ res.file }}{% endautoescape %}</td>
                         <td>{% autoescape off %}{{ res.description }}{% endautoescape %}</td>
                         <td>{{ res.date }}</td>
                         <td>{{ res.author }}</td>
