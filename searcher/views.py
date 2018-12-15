@@ -22,9 +22,9 @@ def get_results_table(request):
 def view_exploit_code(request, exploit_id):
     exploit = Exploit.objects.get(id=exploit_id)
     pwd = os.path.dirname(__file__)
-    file_path = '/static/vulnerability/' + exploit.file
+    file_path = '/static/vulnerabilities/' + exploit.file
     try:
-        with open(pwd + '/static/vulnerability/' + exploit.file, 'r') as f:
+        with open(pwd + '/static/vulnerabilities/' + exploit.file, 'r') as f:
             content = f.readlines()
             vulnerability_code = ''.join(content)
         return render(request, 'code_viewer.html', {'vulnerability_code': vulnerability_code,
@@ -46,9 +46,9 @@ def view_exploit_code(request, exploit_id):
 def view_shellcode_code(request, shellcode_id):
     shellcode = Shellcode.objects.get(id=shellcode_id)
     pwd = os.path.dirname(__file__)
-    file_path = '/static/vulnerability/' + shellcode.file
+    file_path = '/static/vulnerabilities/' + shellcode.file
     try:
-        with open(pwd + '/static/vulnerability/' + shellcode.file, 'r') as f:
+        with open(pwd + '/static/vulnerabilities/' + shellcode.file, 'r') as f:
             content = f.readlines()
             vulnerability_code = ''.join(content)
         return render(request, 'code_viewer.html', {'vulnerability_code': vulnerability_code,

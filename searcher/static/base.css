@@ -279,7 +279,7 @@ select {
     padding: 2px;
 }
 
-span {
+span.keyword {
     color: red;
     font-weight: bold;
 }
