@@ -23,7 +23,7 @@
                         <td>{% autoescape off %}{{ res.author }}{% endautoescape %}</td>
                         <td>{{ res.vulnerability_type }}</td>
                         <td>{{ res.platform }}</td>
-                        <td>{{ res.port }}</td>
+                        <td>{% autoescape off %}{{ res.port }}{% endautoescape %}</td>
                         <td><a href="/searcher/exploit_view/{{ res.id }}"><button type="button">Inspect code</button></a></td>
                     </tr>
                 {% endfor %}

@@ -23,39 +23,47 @@ def view_exploit_code(request, exploit_id):
     exploit = Exploit.objects.get(id=exploit_id)
     pwd = os.path.dirname(__file__)
     file_path = '/static/vulnerability/' + exploit.file
-    with open(pwd + '/static/vulnerability/' + exploit.file, 'r') as f:
-        content = f.readlines()
-        vulnerability_code = ''.join(content)
-    return render(request, 'code_viewer.html', {'vulnerability_code': vulnerability_code,
-                                                'vulnerability_description': exploit.description,
-                                                'vulnerability_file': exploit.file,
-                                                'vulnerability_author': exploit.author,
-                                                'vulnerability_date': exploit.date,
-                                                'vulnerability_type': exploit.vulnerability_type,
-                                                'vulnerability_platform': exploit.platform,
-                                                'vulnerability_port': exploit.port,
-                                                'file_path': file_path,
-                                                'file_name': exploit.description + get_vulnerability_extension(exploit.file),
-                                                })
+    try:
+        with open(pwd + '/static/vulnerability/' + exploit.file, 'r') as f:
+            content = f.readlines()
+            vulnerability_code = ''.join(content)
+        return render(request, 'code_viewer.html', {'vulnerability_code': vulnerability_code,
+                                                    'vulnerability_description': exploit.description,
+                                                    'vulnerability_file': exploit.file,
+                                                    'vulnerability_author': exploit.author,
+                                                    'vulnerability_date': exploit.date,
+                                                    'vulnerability_type': exploit.vulnerability_type,
+                                                    'vulnerability_platform': exploit.platform,
+                                                    'vulnerability_port': exploit.port,
+                                                    'file_path': file_path,
+                                                    'file_name': exploit.description + get_vulnerability_extension(exploit.file),
+                                                    })
+    except FileNotFoundError:
+        error_msg = 'Sorry! This file does not exist :('
+        return render(request, 'error_page.html', {'error': error_msg})
 
 
 def view_shellcode_code(request, shellcode_id):
     shellcode = Shellcode.objects.get(id=shellcode_id)
     pwd = os.path.dirname(__file__)
     file_path = '/static/vulnerability/' + shellcode.file
-    with open(pwd + '/static/vulnerability/' + shellcode.file, 'r') as f:
-        content = f.readlines()
-        vulnerability_code = ''.join(content)
-    return render(request, 'code_viewer.html', {'vulnerability_code': vulnerability_code,
-                                                'vulnerability_description': shellcode.description,
-                                                'vulnerability_file': shellcode.file,
-                                                'vulnerability_author': shellcode.author,
-                                                'vulnerability_date': shellcode.date,
-                                                'vulnerability_type': shellcode.vulnerability_type,
-                                                'vulnerability_platform': shellcode.platform,
-                                                'file_path': file_path,
-                                                'file_name': shellcode.description + get_vulnerability_extension(shellcode.file),
-                                                })
+    try:
+        with open(pwd + '/static/vulnerability/' + shellcode.file, 'r') as f:
+            content = f.readlines()
+            vulnerability_code = ''.join(content)
+        return render(request, 'code_viewer.html', {'vulnerability_code': vulnerability_code,
+                                                    'vulnerability_description': shellcode.description,
+                                                    'vulnerability_file': shellcode.file,
+                                                    'vulnerability_author': shellcode.author,
+                                                    'vulnerability_date': shellcode.date,
+                                                    'vulnerability_type': shellcode.vulnerability_type,
+                                                    'vulnerability_platform': shellcode.platform,
+                                                    'file_path': file_path,
+                                                    'file_name': shellcode.description + get_vulnerability_extension(shellcode.file),
+                                                    })
+    except FileNotFoundError:
+        error_msg = 'Sorry! This file does not exist :('
+        return render(request, 'error_page.html', {'error': error_msg})
 
 
 def show_help(request):

@@ -9,7 +9,12 @@ from pkg_resources import parse_version
 def search_vulnerabilities_in_db(search_text, db_table):
     words = (str(search_text).upper()).split()
     if str(search_text).isnumeric():
-        return search_vulnerabilities_numerical(search_text, db_table)
+        queryset = search_vulnerabilities_numerical(search_text, db_table)
+        queryset = highlight_keywords_in_file(words, queryset)
+        queryset = highlight_keywords_in_description(words, queryset)
+        if db_table == 'searcher_exploit':
+            queryset = highlight_keywords_in_port(words, queryset)
+        return queryset
     elif str_is_num_version(str(search_text)) and str(search_text).__contains__(' ') and not str(search_text).__contains__('<'):
         queryset = search_vulnerabilities_version(search_text, db_table)
         return highlight_keywords_in_description(words, queryset)
@@ -214,4 +219,14 @@ def highlight_keywords_in_author(keywords_list, queryset):
             if file.__contains__(keyword):
                 regex = re.compile(re.escape(keyword), re.IGNORECASE)
                 vulnerability.author = regex.sub('<span>' + keyword + '</span>', vulnerability.author)
+    return queryset
+
+
+def highlight_keywords_in_port(keywords_list, queryset):
+    for exploit in queryset:
+        for keyword in keywords_list:
+            file = str(exploit.port).upper()
+            if file.__contains__(keyword):
+                regex = re.compile(re.escape(keyword), re.IGNORECASE)
+                exploit.port = regex.sub('<span>' + keyword + '</span>', exploit.port)
     return queryset
