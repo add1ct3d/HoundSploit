@@ -1,10 +1,10 @@
 from django.shortcuts import render
-from searcher.search_engine import search_vulnerabilities_in_db
-from searcher.search_engine import is_valid_input
+from searcher.search_engine import search_vulnerabilities_in_db, is_valid_input, search_vulnerabilities_advanced
 from searcher.models import Exploit, Shellcode
 import os
 import re
 from searcher.forms import AdvancedSearchForm
+from searcher.forms import OPERATOR_CHOICES
 
 
 def get_results_table(request):
@@ -82,5 +82,24 @@ def get_vulnerability_extension(vulnerability_file):
 
 
 def get_results_table_advanced(request):
-    form = AdvancedSearchForm
-    return render(request, 'advanced_searcher.html', {'form': form})
+    if request.POST:
+        form = AdvancedSearchForm(request.POST)
+        print('POST')
+        if form.is_valid():
+            search_text = form.cleaned_data['search_text']
+            operator_filter_index = int(form.cleaned_data['operator']) - 1
+            print(operator_filter_index)
+            operator_filter = OPERATOR_CHOICES.__getitem__(operator_filter_index)[1]
+            print(operator_filter)
+            return render(request, 'results_table.html', {'searched_item': str(search_text),
+                                                      'exploits_results': search_vulnerabilities_advanced(search_text,'searcher_exploit', operator_filter),
+                                                      'n_exploits_results': len(search_vulnerabilities_advanced(search_text,'searcher_exploit', operator_filter)),
+                                                      'shellcodes_results': search_vulnerabilities_advanced(search_text,'searcher_shellcode', operator_filter),
+                                                      'n_shellcodes_results': len(search_vulnerabilities_advanced(search_text,'searcher_shellcode', operator_filter))
+                                                      })
+        else:
+            form = AdvancedSearchForm()
+            return render(request, 'advanced_searcher.html', {'form': form})
+    else:
+        form = AdvancedSearchForm()
+        return render(request, 'advanced_searcher.html', {'form': form})

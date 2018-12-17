@@ -230,3 +230,16 @@ def highlight_keywords_in_port(keywords_list, queryset):
                 regex = re.compile(re.escape(keyword), re.IGNORECASE)
                 exploit.port = regex.sub("<span class='keyword'>" + keyword + '</span>', exploit.port)
     return queryset
+
+
+def search_vulnerabilities_advanced(search_text, db_table, operator_filter):
+    words_list = str(search_text).upper().split()
+    if operator_filter == 'AND':
+        query = reduce(operator.and_, (Q(description__icontains=word) for word in words_list))
+    else:
+        query = reduce(operator.or_, (Q(description__icontains=word) for word in words_list))
+    if db_table == 'searcher_exploit':
+        queryset = Exploit.objects.filter(query)
+    else:
+        queryset = Shellcode.objects.filter(query)
+    return highlight_keywords_in_description(words_list, queryset)
