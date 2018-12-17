@@ -3,8 +3,8 @@ from searcher.models import Exploit, Shellcode
 
 
 OPERATOR_CHOICES = [
-        (1, u'AND'),
-        (2, u'OR'),
+        (0, u'AND'),
+        (1, u'OR'),
     ]
 
 

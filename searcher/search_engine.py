@@ -232,7 +232,7 @@ def highlight_keywords_in_port(keywords_list, queryset):
     return queryset
 
 
-def search_vulnerabilities_advanced(search_text, db_table, operator_filter):
+def search_vulnerabilities_advanced(search_text, db_table, operator_filter, type_filter, platform_filter, author_filter):
     words_list = str(search_text).upper().split()
     if operator_filter == 'AND':
         query = reduce(operator.and_, (Q(description__icontains=word) for word in words_list))
@@ -242,4 +242,10 @@ def search_vulnerabilities_advanced(search_text, db_table, operator_filter):
         queryset = Exploit.objects.filter(query)
     else:
         queryset = Shellcode.objects.filter(query)
+    if type_filter != 'All':
+        queryset = queryset.filter(vulnerability_type__exact=type_filter)
+    if platform_filter != 'All':
+        queryset = queryset.filter(platform__exact=platform_filter)
+    if author_filter != '':
+        queryset = queryset.filter(author__iexact=author_filter)
     return highlight_keywords_in_description(words_list, queryset)

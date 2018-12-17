@@ -4,7 +4,7 @@ from searcher.models import Exploit, Shellcode
 import os
 import re
 from searcher.forms import AdvancedSearchForm
-from searcher.forms import OPERATOR_CHOICES
+from searcher.forms import OPERATOR_CHOICES, get_type_values, get_platform_values
 
 
 def get_results_table(request):
@@ -84,19 +84,24 @@ def get_vulnerability_extension(vulnerability_file):
 def get_results_table_advanced(request):
     if request.POST:
         form = AdvancedSearchForm(request.POST)
-        print('POST')
         if form.is_valid():
             search_text = form.cleaned_data['search_text']
-            operator_filter_index = int(form.cleaned_data['operator']) - 1
-            print(operator_filter_index)
+            operator_filter_index = int(form.cleaned_data['operator'])
             operator_filter = OPERATOR_CHOICES.__getitem__(operator_filter_index)[1]
-            print(operator_filter)
+            type_filter_index = int(form.cleaned_data['type'])
+            type_filter = get_type_values().__getitem__(type_filter_index)[1]
+            platform_filter_index = int(form.cleaned_data['platform'])
+            platform_filter = get_platform_values().__getitem__(platform_filter_index)[1]
+            author_filter = form.cleaned_data['author']
+
+            func_exploits = search_vulnerabilities_advanced(search_text,'searcher_exploit', operator_filter, type_filter, platform_filter, author_filter)
+            func_shellcodes = search_vulnerabilities_advanced(search_text, 'searcher_shellcode', operator_filter,type_filter, platform_filter, author_filter)
             return render(request, 'results_table.html', {'searched_item': str(search_text),
-                                                      'exploits_results': search_vulnerabilities_advanced(search_text,'searcher_exploit', operator_filter),
-                                                      'n_exploits_results': len(search_vulnerabilities_advanced(search_text,'searcher_exploit', operator_filter)),
-                                                      'shellcodes_results': search_vulnerabilities_advanced(search_text,'searcher_shellcode', operator_filter),
-                                                      'n_shellcodes_results': len(search_vulnerabilities_advanced(search_text,'searcher_shellcode', operator_filter))
-                                                      })
+                                                          'exploits_results': func_exploits,
+                                                          'n_exploits_results': len(func_exploits),
+                                                          'shellcodes_results': func_shellcodes,
+                                                          'n_shellcodes_results': len(func_shellcodes)
+                                                          })
         else:
             form = AdvancedSearchForm()
             return render(request, 'advanced_searcher.html', {'form': form})
