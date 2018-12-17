@@ -4,9 +4,21 @@
 {% endblock %}
 {% block h1_style %}style="margin-top: 10px"{% endblock %}
 {% block input_form %}
-    <form action="{% url 'get_results_table' %}" method="POST">
+    <form action="{% url 'get_results_table_advanced' %}" method="POST">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Search</button>
+        {{ form.search_text }}
+        <button name="advanced_search_btn" type="submit">Search</button>
+        <div class="info_container">
+            <label>Search operator:</label>
+            {{ form.operator }}
+            <label>Author:</label>
+            {{ form.author }}<br>
+            <label>Type:</label>
+            {{ form.type }}
+            <label>Platform:</label>
+            {{ form.platform }}
+            <label>Port:</label>
+            {{ form.port }}
+        </div>
     </form>
 {% endblock %}

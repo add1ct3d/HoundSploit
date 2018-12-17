@@ -45,9 +45,9 @@ def get_platform_values():
 
 
 class AdvancedSearchForm(forms.Form):
-    search_text = forms.CharField(label='')
+    search_text = forms.CharField(label='', required=True)
     operator = forms.ChoiceField(label='Operator', choices=OPERATOR_CHOICES)
-    author = forms.CharField(label='author', max_length=100)
+    author = forms.CharField(label='author', max_length=100, required=False)
     type = forms.ChoiceField(label='Type', choices=get_type_values())
     platform = forms.ChoiceField(label='Platform', choices=get_platform_values())
-    port = forms.IntegerField(label='Port')
+    port = forms.IntegerField(label='Port', min_value=0, max_value=65535, required=False)

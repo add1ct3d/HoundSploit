@@ -81,6 +81,6 @@ def get_vulnerability_extension(vulnerability_file):
     return extension
 
 
-def show_advanced_search(request):
+def get_results_table_advanced(request):
     form = AdvancedSearchForm
     return render(request, 'advanced_searcher.html', {'form': form})
