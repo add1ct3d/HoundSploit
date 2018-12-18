@@ -246,23 +246,20 @@ def highlight_keywords_in_port(keywords_list, queryset):
 
 def search_vulnerabilities_advanced(search_text, db_table, operator_filter, type_filter, platform_filter, author_filter, port_filter):
     words_list = str(search_text).upper().split()
-    try:
-        if operator_filter == 'AND':
-            query = reduce(operator.and_, (Q(description__icontains=word) for word in words_list))
-        else:
+    if operator_filter == 'AND' and search_text != '':
+        queryset = search_vulnerabilities_for_description_advanced(search_text, db_table)
+    elif operator_filter == 'OR':
+        try:
             query = reduce(operator.or_, (Q(description__icontains=word) for word in words_list))
-    except TypeError:
-        pass
-    if db_table == 'searcher_exploit':
-        if search_text != '':
-            queryset = Exploit.objects.filter(query)
-        else:
-            queryset = Exploit.objects.all()
-    else:
-        if search_text != '':
-            queryset = Shellcode.objects.filter(query)
-        else:
-            queryset = Shellcode.objects.all()
+            if db_table == 'searcher_exploit':
+                queryset = Exploit.objects.filter(query)
+            else:
+                queryset = Shellcode.objects.filter(query)
+        except TypeError:
+            if db_table == 'searcher_exploit':
+                queryset = Exploit.objects.all()
+            else:
+                queryset = Shellcode.objects.all()
     if type_filter != 'All':
         queryset = queryset.filter(vulnerability_type__exact=type_filter)
     if platform_filter != 'All':
@@ -276,4 +273,13 @@ def search_vulnerabilities_advanced(search_text, db_table, operator_filter, type
         return Shellcode.objects.none()
     else:
         return highlight_keywords_in_description(words_list, queryset)
+
+
+def search_vulnerabilities_for_description_advanced(search_text, db_table):
+    # words = (str(search_text).upper()).split()
+    if str_is_num_version(str(search_text)) and str(search_text).__contains__(' ') and not str(search_text).__contains__('<'):
+        queryset = search_vulnerabilities_version(search_text, db_table)
+    else:
+        queryset = search_vulnerabilities_for_description(search_text, db_table)
+    return queryset
 
