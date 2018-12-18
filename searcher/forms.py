@@ -51,3 +51,5 @@ class AdvancedSearchForm(forms.Form):
     type = forms.ChoiceField(label='Type', choices=get_type_values())
     platform = forms.ChoiceField(label='Platform', choices=get_platform_values())
     port = forms.IntegerField(label='Port', min_value=0, max_value=65535, required=False)
+    start_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    end_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
