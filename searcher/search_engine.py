@@ -260,6 +260,11 @@ def search_vulnerabilities_advanced(search_text, db_table, operator_filter, type
                 queryset = Exploit.objects.all()
             else:
                 queryset = Shellcode.objects.all()
+    else:
+        if db_table == 'searcher_exploit':
+            queryset = Exploit.objects.all()
+        else:
+            queryset = Shellcode.objects.all()
     if type_filter != 'All':
         queryset = queryset.filter(vulnerability_type__exact=type_filter)
     if platform_filter != 'All':
