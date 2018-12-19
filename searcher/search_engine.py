@@ -4,7 +4,6 @@ import re
 from django.db.models import Q
 import operator
 from pkg_resources import parse_version
-import datetime
 
 
 def search_vulnerabilities_in_db(search_text, db_table):
@@ -144,7 +143,6 @@ def search_vulnerabilities_version(search_text, db_table):
             software_name = software_name + ' ' + word
         else:
             num_version = word
-    # print(software_name, num_version)
     if db_table == 'searcher_exploit':
         return search_exploits_version(software_name, num_version)
     else:
@@ -206,7 +204,6 @@ def highlight_keywords_in_description(keywords_list, queryset):
                     regex = re.compile(re.escape(keyword), re.IGNORECASE)
                     vulnerability.description = regex.sub("<span class='keyword'>" + keyword + '</span>',
                                                           vulnerability.description)
-        print(vulnerability.description)
     return queryset
 
 
