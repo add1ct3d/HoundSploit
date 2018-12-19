@@ -12,7 +12,7 @@ def get_results_table(request):
         search_text = request.POST['search_item']
         return render(request, "results_table.html", {'searched_item': str(search_text),
                                                       'exploits_results': search_vulnerabilities_in_db(search_text, 'searcher_exploit'),
-                                                      'n_exploits_results': len(search_vulnerabilities_in_db(search_text, 'searcher_exploit')),
+                                                      'n_exploits_results': len(search_vulnerabilities_in_db(search_text,'searcher_exploit')),
                                                       'shellcodes_results': search_vulnerabilities_in_db(search_text, 'searcher_shellcode'),
                                                       'n_shellcodes_results': len(search_vulnerabilities_in_db(search_text, 'searcher_shellcode'))
                                                       })
@@ -96,7 +96,6 @@ def get_results_table_advanced(request):
             port_filter = form.cleaned_data['port']
             start_date_filter = form.cleaned_data['start_date']
             end_date_filter = form.cleaned_data['end_date']
-            print(start_date_filter, end_date_filter)
 
             func_exploits = search_vulnerabilities_advanced(search_text,'searcher_exploit', operator_filter, type_filter, platform_filter, author_filter, port_filter, start_date_filter, end_date_filter)
             func_shellcodes = search_vulnerabilities_advanced(search_text, 'searcher_shellcode', operator_filter, type_filter, platform_filter, author_filter, '', start_date_filter, end_date_filter)
