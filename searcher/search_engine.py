@@ -4,6 +4,7 @@ import re
 from django.db.models import Q
 import operator
 from pkg_resources import parse_version
+import datetime
 
 
 def search_vulnerabilities_in_db(search_text, db_table):
@@ -244,7 +245,7 @@ def highlight_keywords_in_port(keywords_list, queryset):
     return queryset
 
 
-def search_vulnerabilities_advanced(search_text, db_table, operator_filter, type_filter, platform_filter, author_filter, port_filter):
+def search_vulnerabilities_advanced(search_text, db_table, operator_filter, type_filter, platform_filter, author_filter, port_filter, start_date_filter, end_date_filter):
     words_list = str(search_text).upper().split()
     if operator_filter == 'AND' and search_text != '':
         queryset = search_vulnerabilities_for_description_advanced(search_text, db_table)
@@ -271,6 +272,11 @@ def search_vulnerabilities_advanced(search_text, db_table, operator_filter, type
         queryset = queryset.filter(platform__exact=platform_filter)
     if author_filter != '':
         queryset = queryset.filter(author__icontains=author_filter)
+    try:
+        queryset = queryset.filter(date__gte=start_date_filter)
+        queryset = queryset.filter(date__lte=end_date_filter)
+    except ValueError:
+        pass
     if (port_filter is not None) and (db_table == 'searcher_exploit'):
         queryset = queryset.filter(port__exact=port_filter)
         return highlight_keywords_in_description(words_list, queryset)
