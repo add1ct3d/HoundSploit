@@ -98,7 +98,7 @@ def get_results_table_advanced(request):
             end_date_filter = form.cleaned_data['end_date']
 
             func_exploits = search_vulnerabilities_advanced(search_text,'searcher_exploit', operator_filter, type_filter, platform_filter, author_filter, port_filter, start_date_filter, end_date_filter)
-            func_shellcodes = search_vulnerabilities_advanced(search_text, 'searcher_shellcode', operator_filter, type_filter, platform_filter, author_filter, '', start_date_filter, end_date_filter)
+            func_shellcodes = search_vulnerabilities_advanced(search_text, 'searcher_shellcode', operator_filter, type_filter, platform_filter, author_filter, port_filter, start_date_filter, end_date_filter)
             return render(request, 'advanced_results_table.html', {'form': form,
                                                                    'searched_item': str(search_text),
                                                                    'exploits_results': func_exploits,

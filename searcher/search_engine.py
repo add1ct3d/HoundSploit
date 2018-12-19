@@ -277,10 +277,10 @@ def search_vulnerabilities_advanced(search_text, db_table, operator_filter, type
         queryset = queryset.filter(date__lte=end_date_filter)
     except ValueError:
         pass
-    if (port_filter is not None) and (db_table == 'searcher_exploit'):
+    if port_filter is not None and db_table == 'searcher_exploit':
         queryset = queryset.filter(port__exact=port_filter)
         return highlight_keywords_in_description(words_list, queryset)
-    elif (port_filter is not None) and (db_table == 'searcher_shellcode'):
+    elif port_filter is not None and db_table == 'searcher_shellcode':
         return Shellcode.objects.none()
     else:
         return highlight_keywords_in_description(words_list, queryset)
