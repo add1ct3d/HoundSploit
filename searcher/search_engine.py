@@ -200,11 +200,13 @@ def search_shellcodes_version(software_name, num_version):
 def highlight_keywords_in_description(keywords_list, queryset):
     for vulnerability in queryset:
         for keyword in keywords_list:
-            description = str(vulnerability.description).upper()
-            if description.__contains__(keyword):
-                regex = re.compile(re.escape(keyword), re.IGNORECASE)
-                vulnerability.description = regex.sub("<span class='keyword'>" + keyword + '</span>',
-                                                      vulnerability.description)
+            if keyword != '<':
+                description = str(vulnerability.description).upper()
+                if description.__contains__(keyword):
+                    regex = re.compile(re.escape(keyword), re.IGNORECASE)
+                    vulnerability.description = regex.sub("<span class='keyword'>" + keyword + '</span>',
+                                                          vulnerability.description)
+        print(vulnerability.description)
     return queryset
 
 
