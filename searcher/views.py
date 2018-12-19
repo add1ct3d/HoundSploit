@@ -99,12 +99,13 @@ def get_results_table_advanced(request):
 
             func_exploits = search_vulnerabilities_advanced(search_text,'searcher_exploit', operator_filter, type_filter, platform_filter, author_filter, port_filter, start_date_filter, end_date_filter)
             func_shellcodes = search_vulnerabilities_advanced(search_text, 'searcher_shellcode', operator_filter, type_filter, platform_filter, author_filter, '', start_date_filter, end_date_filter)
-            return render(request, 'results_table.html', {'searched_item': str(search_text),
-                                                          'exploits_results': func_exploits,
-                                                          'n_exploits_results': len(func_exploits),
-                                                          'shellcodes_results': func_shellcodes,
-                                                          'n_shellcodes_results': len(func_shellcodes)
-                                                          })
+            return render(request, 'advanced_results_table.html', {'form': form,
+                                                                   'searched_item': str(search_text),
+                                                                   'exploits_results': func_exploits,
+                                                                   'n_exploits_results': len(func_exploits),
+                                                                   'shellcodes_results': func_shellcodes,
+                                                                   'n_shellcodes_results': len(func_shellcodes)
+                                                                   })
         else:
             form = AdvancedSearchForm()
             return render(request, 'advanced_searcher.html', {'form': form})
