@@ -1,23 +1,30 @@
 from django.shortcuts import render
-from searcher.search_engine import search_vulnerabilities_in_db, is_valid_input, search_vulnerabilities_advanced
+from searcher.search_engine import search_vulnerabilities_in_db, search_vulnerabilities_advanced
 from searcher.models import Exploit, Shellcode
 import os
 import re
-from searcher.forms import AdvancedSearchForm
+from searcher.forms import AdvancedSearchForm, SimpleSearchForm
 from searcher.forms import OPERATOR_CHOICES, get_type_values, get_platform_values
 
 
 def get_results_table(request):
-    if request.POST and is_valid_input(request.POST['search_item']):
-        search_text = request.POST['search_item']
-        return render(request, "results_table.html", {'searched_item': str(search_text),
-                                                      'exploits_results': search_vulnerabilities_in_db(search_text, 'searcher_exploit'),
-                                                      'n_exploits_results': len(search_vulnerabilities_in_db(search_text,'searcher_exploit')),
-                                                      'shellcodes_results': search_vulnerabilities_in_db(search_text, 'searcher_shellcode'),
-                                                      'n_shellcodes_results': len(search_vulnerabilities_in_db(search_text, 'searcher_shellcode'))
-                                                      })
+    if request.POST:
+        form = SimpleSearchForm(request.POST)
+        if form.is_valid():
+            search_text = form.cleaned_data['search_text']
+            return render(request, "results_table.html", {'form': form,
+                                                          'searched_item': str(search_text),
+                                                          'exploits_results': search_vulnerabilities_in_db(search_text, 'searcher_exploit'),
+                                                          'n_exploits_results': len(search_vulnerabilities_in_db(search_text,'searcher_exploit')),
+                                                          'shellcodes_results': search_vulnerabilities_in_db(search_text, 'searcher_shellcode'),
+                                                          'n_shellcodes_results': len(search_vulnerabilities_in_db(search_text, 'searcher_shellcode'))
+                                                          })
+        else:
+            form = SimpleSearchForm()
+            return render(request, 'home.html', {'form': form})
     else:
-        return render(request, 'home.html')
+        form = SimpleSearchForm()
+        return render(request, 'home.html', {'form': form})
 
 
 def view_exploit_code(request, exploit_id):

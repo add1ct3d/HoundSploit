@@ -74,13 +74,6 @@ def search_vulnerabilities_for_author(search_text, db_table):
     return queryset
 
 
-def is_valid_input(string):
-    if not string.isspace() and string != '' and not str(string).__contains__('\''):
-        return True
-    else:
-        return False
-
-
 def str_contains_numbers(str):
     return bool(re.search(r'\d', str))
 

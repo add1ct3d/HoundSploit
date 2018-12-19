@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% block input_form %}
     <form action="{% url 'get_results_table' %}" method="POST">
-        <input type="text" name="search_item"> <input type="submit" value="Search">
         {% csrf_token %}
+        {{ form.search_text }}
+        <button name="advanced_search_btn" type="submit">Search</button>
     </form>
 {% endblock %}
