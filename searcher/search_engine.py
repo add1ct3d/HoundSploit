@@ -135,6 +135,27 @@ def is_in_version_range(num_version, software_name, description):
         return False
 
 
+def is_equal_with_x(num_version, num_to_compare):
+    version_precision = str(num_to_compare).count('.') + 1
+    try:
+        if version_precision == 1:
+            regex = re.search(r'\d+', num_version)
+        elif version_precision == 2:
+            regex = re.search(r'\d+\.\d+', num_version)
+        elif version_precision == 3:
+            regex = re.search(r'\d+\.\d+\.\d+', num_version)
+        elif version_precision == 4:
+            regex = re.search(r'\d+\.\d+\.\d+\.\d+', num_version)
+        num_version = regex.group()
+    except AttributeError:
+        pass
+    if parse_version(num_version) == parse_version(num_to_compare):
+        return True
+    else:
+        return False
+
+
+
 def search_vulnerabilities_version(search_text, db_table):
     words = str(search_text).upper().split()
     software_name = words[0]
@@ -153,11 +174,18 @@ def search_exploits_version(software_name, num_version):
     queryset = Exploit.objects.filter(description__icontains=software_name)
     for exploit in queryset:
         if not str(exploit.description).__contains__('<'):
-            try:
-                if parse_version(num_version) != parse_version(get_num_version(software_name, exploit.description)):
+            if not exploit.description.__contains__('.x'):
+                try:
+                    if parse_version(num_version) != parse_version(get_num_version(software_name, exploit.description)):
+                        queryset = queryset.exclude(description__exact=exploit.description)
+                except TypeError:
                     queryset = queryset.exclude(description__exact=exploit.description)
-            except TypeError:
-                queryset = queryset.exclude(description__exact=exploit.description)
+            else:
+                try:
+                    if not is_equal_with_x(num_version, get_num_version(software_name, exploit.description)):
+                        queryset = queryset.exclude(description__exact=exploit.description)
+                except TypeError:
+                    queryset = queryset.exclude(description__exact=exploit.description)
         else:
             if str_contains_num_version_range(str(exploit.description)):
                 if not is_in_version_range(num_version, software_name, exploit.description):
