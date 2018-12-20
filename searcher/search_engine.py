@@ -115,6 +115,38 @@ def get_num_version_with_comparator(software_name, description):
         return
 
 
+def is_lte_with_comparator_x(num_version, software_name, description):
+    software_name = software_name.upper()
+    description = description.upper()
+    regex = re.search(software_name + r' < (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', description)
+    try:
+        software = regex.group(0)
+        regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', software)
+        try:
+            num_to_compare = regex.group(0)
+            version_precision = str(num_to_compare).count('.') + 1
+        except AttributeError:
+            return False
+    except AttributeError:
+        return False
+    try:
+        if version_precision == 1:
+            regex = re.search(r'\d+', num_version)
+        elif version_precision == 2:
+            regex = re.search(r'\d+\.\d+', num_version)
+        elif version_precision == 3:
+            regex = re.search(r'\d+\.\d+\.\d+', num_version)
+        elif version_precision == 4:
+            regex = re.search(r'\d+\.\d+\.\d+\.\d+', num_version)
+        num_version = regex.group()
+    except AttributeError:
+        return False
+    if parse_version(num_version) <= parse_version(num_to_compare):
+        return True
+    else:
+        return False
+
+
 def is_in_version_range(num_version, software_name, description):
     software_name = software_name.upper()
     description = description.upper()
@@ -155,7 +187,6 @@ def is_equal_with_x(num_version, num_to_compare):
         return False
 
 
-
 def search_vulnerabilities_version(search_text, db_table):
     words = str(search_text).upper().split()
     software_name = words[0]
@@ -187,16 +218,28 @@ def search_exploits_version(software_name, num_version):
                 except TypeError:
                     queryset = queryset.exclude(description__exact=exploit.description)
         else:
-            if str_contains_num_version_range(str(exploit.description)):
-                if not is_in_version_range(num_version, software_name, exploit.description):
-                    queryset = queryset.exclude(description__exact=exploit.description)
-            else:
-                try:
-                    if parse_version(num_version) > parse_version(
-                            get_num_version_with_comparator(software_name, exploit.description)):
+            if not exploit.description.__contains__('.x'):
+                if str_contains_num_version_range(str(exploit.description)):
+                    if not is_in_version_range(num_version, software_name, exploit.description):
                         queryset = queryset.exclude(description__exact=exploit.description)
-                except TypeError:
-                    queryset = queryset.exclude(description__exact=exploit.description)
+                else:
+                    try:
+                        if parse_version(num_version) > parse_version(
+                                get_num_version_with_comparator(software_name, exploit.description)):
+                            queryset = queryset.exclude(description__exact=exploit.description)
+                    except TypeError:
+                        queryset = queryset.exclude(description__exact=exploit.description)
+            else:
+                # todo .x
+                if str_contains_num_version_range(str(exploit.description)):
+                    if not is_in_version_range(num_version, software_name, exploit.description):
+                        queryset = queryset.exclude(description__exact=exploit.description)
+                else:
+                    try:
+                        if not is_lte_with_comparator_x(num_version, software_name, exploit.description):
+                            queryset = queryset.exclude(description__exact=exploit.description)
+                    except TypeError:
+                        queryset = queryset.exclude(description__exact=exploit.description)
     return queryset
 
 
