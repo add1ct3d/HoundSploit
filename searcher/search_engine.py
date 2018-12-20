@@ -85,6 +85,10 @@ def str_contains_num_version_range(str):
     return bool(re.search(r'(\d\.\d\.\d\.\d|\d\.\d\.\d|\d\.\d|\d) < (\d\.\d\.\d\.\d|\d\.\d\.\d|\d\.\d|\d)', str))
 
 
+def str_contains_num_version_range_with_x(str):
+    return bool(re.search(r'(\d\.\d\.\d\.\d|\d\.\d\.\d|\d\.\d|\d)\.x < (\d\.\d\.\d\.\d|\d\.\d\.\d|\d\.\d|\d)\.x', str))
+
+
 def get_num_version(software_name, description):
     software_name = software_name.upper()
     description = description.upper()
@@ -167,6 +171,35 @@ def is_in_version_range(num_version, software_name, description):
         return False
 
 
+def is_in_version_range_with_x(num_version, software_name, description):
+    software_name = software_name.upper()
+    description = description.upper()
+    regex = re.search(
+        software_name + r' (\w+\.\w+\.\w+\.\w+|\w+\.\w+\.\w+|\w+\.\w+|\w+)\.X < (\w+\.\w+\.\w+\.\w+|\w+\.\w+\.\w+|\w+\.\w+|\w+)\.X',description)
+    try:
+        software = regex.group(0)
+        print('software', software)
+        regex = re.search(
+            r'(?P<from_version>(\w+\.\w+\.\w+\.\w+|\w+\.\w+\.\w+|\w+\.\w+|\w+))\.X < (?P<to_version>(\w+\.\w+\.\w+\.\w+|\w+\.\w+\.\w+|\w+\.\w+|\w+))\.X',
+            software)
+        print('num:', num_version)
+        print('from:', regex.group('from_version'))
+        from_version = regex.group('from_version')
+        to_version = regex.group('to_version')
+        regex = re.search(r'(?P<base>\w+)\.(?P<least_digit>\d+)$', to_version)
+        print(regex.group('least_digit'))
+        least_digit = int(regex.group('least_digit')) + 1
+        to_version = regex.group('base') + '.' + str(least_digit)
+        print(to_version)
+        if parse_version(num_version) >= parse_version(from_version) and parse_version(
+                num_version) <= parse_version(to_version):
+            return True
+        else:
+            return False
+    except AttributeError:
+        return False
+
+
 def is_equal_with_x(num_version, num_to_compare):
     version_precision = str(num_to_compare).count('.') + 1
     try:
@@ -231,8 +264,8 @@ def search_exploits_version(software_name, num_version):
                         queryset = queryset.exclude(description__exact=exploit.description)
             else:
                 # todo .x
-                if str_contains_num_version_range(str(exploit.description)):
-                    if not is_in_version_range(num_version, software_name, exploit.description):
+                if str_contains_num_version_range_with_x(str(exploit.description)):
+                    if not is_in_version_range_with_x(num_version, software_name, exploit.description):
                         queryset = queryset.exclude(description__exact=exploit.description)
                 else:
                     try:
