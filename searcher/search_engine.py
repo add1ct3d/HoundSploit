@@ -191,7 +191,10 @@ def is_in_version_range_with_x(num_version, software_name, description):
         from_version = regex.group('from_version')
         print('from1:', from_version)
         regex = re.search(r'(?P<base>\w+)\.(?P<least_digit>\d+)($|\.X)', to_version)
-        least_digit = int(regex.group('least_digit')) + 1
+        if to_version.__contains__('X'):
+            least_digit = int(regex.group('least_digit')) + 1
+        else:
+            least_digit = int(regex.group('least_digit'))
         to_version = regex.group('base') + '.' + str(least_digit)
         print('to2:',to_version)
         if parse_version(num_version) >= parse_version(from_version) and parse_version(
