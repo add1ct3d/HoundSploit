@@ -178,25 +178,19 @@ def is_in_version_range_with_x(num_version, software_name, description):
         software_name + r' (\w+\.\w+\.\w+\.\w+|\w+\.\w+\.\w+|\w+\.\w+|\w+)(\.X)? < (\w+\.\w+\.\w+\.\w+|\w+\.\w+\.\w+|\w+\.\w+|\w+)(\.X)?',description)
     try:
         software = regex.group(0)
-        print('software', software)
         regex = re.search(
             r'(?P<from_version>(\w+\.\w+\.\w+\.\w+|\w+\.\w+\.\w+|\w+\.\w+|\w+))(\.X)? < (?P<to_version>(\w+\.\w+\.\w+\.\w+|\w+\.\w+\.\w+|\w+\.\w+|\w+))(\.X)?',
             software)
-        print('num:', num_version)
-        print('from:', regex.group('from_version'))
         from_version = regex.group('from_version')
         to_version = regex.group('to_version')
-        print('to:', to_version)
         regex = re.search(r'(?P<from_version>(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+))($|\.X)', from_version)
         from_version = regex.group('from_version')
-        print('from1:', from_version)
         regex = re.search(r'(?P<base>\w+)\.(?P<least_digit>\d+)($|\.X)', to_version)
         if to_version.__contains__('X'):
             least_digit = int(regex.group('least_digit')) + 1
         else:
             least_digit = int(regex.group('least_digit'))
         to_version = regex.group('base') + '.' + str(least_digit)
-        print('to2:',to_version)
         if parse_version(num_version) >= parse_version(from_version) and parse_version(
                 num_version) <= parse_version(to_version):
             return True
@@ -406,7 +400,6 @@ def search_vulnerabilities_advanced(search_text, db_table, operator_filter, type
 
 
 def search_vulnerabilities_for_description_advanced(search_text, db_table):
-    # words = (str(search_text).upper()).split()
     if str_is_num_version(str(search_text)) and str(search_text).__contains__(' ') and not str(search_text).__contains__('<'):
         queryset = search_vulnerabilities_version(search_text, db_table)
     else:
