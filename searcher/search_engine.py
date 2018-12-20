@@ -269,7 +269,6 @@ def search_exploits_version(software_name, num_version):
                     except TypeError:
                         queryset = queryset.exclude(description__exact=exploit.description)
             else:
-                # todo .x
                 if str_contains_num_version_range_with_x(str(exploit.description)):
                     if not is_in_version_range_with_x(num_version, software_name, exploit.description):
                         queryset = queryset.exclude(description__exact=exploit.description)
@@ -286,22 +285,40 @@ def search_shellcodes_version(software_name, num_version):
     queryset = Shellcode.objects.filter(description__icontains=software_name)
     for shellcode in queryset:
         if not str(shellcode.description).__contains__('<'):
-            try:
-                if parse_version(num_version) != parse_version(get_num_version(software_name, shellcode.description)):
-                    queryset = queryset.exclude(description__exact=shellcode.description)
-            except TypeError:
-                queryset = queryset.exclude(description__exact=shellcode.description)
-        else:
-            if str_contains_num_version_range(str(shellcode.description)):
-                if not is_in_version_range(num_version, software_name, shellcode.description):
-                    queryset = queryset.exclude(description__exact=shellcode.description)
-            else:
+            if not shellcode.description.__contains__('.x'):
                 try:
-                    if parse_version(num_version) > parse_version(
-                            get_num_version_with_comparator(software_name, shellcode.description)):
+                    if parse_version(num_version) != parse_version(get_num_version(software_name, shellcode.description)):
                         queryset = queryset.exclude(description__exact=shellcode.description)
                 except TypeError:
                     queryset = queryset.exclude(description__exact=shellcode.description)
+            else:
+                try:
+                    if not is_equal_with_x(num_version, get_num_version(software_name, shellcode.description)):
+                        queryset = queryset.exclude(description__exact=shellcode.description)
+                except TypeError:
+                    queryset = queryset.exclude(description__exact=shellcode.description)
+        else:
+            if not shellcode.description.__contains__('.x'):
+                if str_contains_num_version_range(str(shellcode.description)):
+                    if not is_in_version_range(num_version, software_name, shellcode.description):
+                        queryset = queryset.exclude(description__exact=shellcode.description)
+                else:
+                    try:
+                        if parse_version(num_version) > parse_version(
+                                get_num_version_with_comparator(software_name, shellcode.description)):
+                            queryset = queryset.exclude(description__exact=shellcode.description)
+                    except TypeError:
+                        queryset = queryset.exclude(description__exact=shellcode.description)
+            else:
+                if str_contains_num_version_range_with_x(str(shellcode.description)):
+                    if not is_in_version_range_with_x(num_version, software_name, shellcode.description):
+                        queryset = queryset.exclude(description__exact=shellcode.description)
+                else:
+                    try:
+                        if not is_lte_with_comparator_x(num_version, software_name, shellcode.description):
+                            queryset = queryset.exclude(description__exact=shellcode.description)
+                    except TypeError:
+                        queryset = queryset.exclude(description__exact=shellcode.description)
     return queryset
 
 
