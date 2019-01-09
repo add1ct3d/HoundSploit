@@ -79,7 +79,7 @@ def str_contains_numbers(str):
 
 def str_is_num_version(str):
     # return bool(re.search(r'(\d\.\d\.\d\.\d|\d\.\d\.\d|\d\.\d|\d)', str))
-    return bool(re.search(r'[\d+(\.| |^$)]+', str))
+    return bool(re.search(r'\d+([\.\d+]+)?', str))
 
 
 def str_contains_num_version_range(str):
@@ -94,10 +94,12 @@ def str_contains_num_version_range_with_x(str):
 def get_num_version(software_name, description):
     software_name = software_name.upper()
     description = description.upper()
-    regex = re.search(software_name + r' (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', description)
+    # regex = re.search(software_name + r' (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', description)
+    regex = re.search(software_name + r' \d+([\.\d+]+)?', description)
     try:
         software = regex.group(0)
-        regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', software)
+        # regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', software)
+        regex = re.search(r'\d+([\.\d+]+)?', software)
         try:
             return regex.group(0)
         except AttributeError:
@@ -109,10 +111,12 @@ def get_num_version(software_name, description):
 def get_num_version_with_comparator(software_name, description):
     software_name = software_name.upper()
     description = description.upper()
-    regex = re.search(software_name + r' < (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', description)
+    # regex = re.search(software_name + r' < (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', description)
+    regex = re.search(software_name + r' < \d+([\.\d+]+)?', description)
     try:
         software = regex.group(0)
-        regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', software)
+        # regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', software)
+        regex = re.search(r'\d+([\.\d+]+)?', software)
         try:
             return regex.group(0)
         except AttributeError:
@@ -124,10 +128,12 @@ def get_num_version_with_comparator(software_name, description):
 def is_lte_with_comparator_x(num_version, software_name, description):
     software_name = software_name.upper()
     description = description.upper()
-    regex = re.search(software_name + r' < (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', description)
+    # regex = re.search(software_name + r' < (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', description)
+    regex = re.search(software_name + r' < \d+([\.\d+]+)?', description)
     try:
         software = regex.group(0)
-        regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', software)
+        # regex = re.search(r'(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)', software)
+        regex = re.search(r'\d+([\.\d+]+)?', software)
         try:
             num_to_compare = regex.group(0)
             version_precision = str(num_to_compare).count('.') + 1
