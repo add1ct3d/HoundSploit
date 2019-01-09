@@ -88,7 +88,8 @@ def str_contains_num_version_range(str):
 
 
 def str_contains_num_version_range_with_x(str):
-    return bool(re.search(r'\d+([\.\d+]+)? < \d+([\.\d+]+)?(\.x)? < \d+([\.\d+]+)? < \d+([\.\d+]+)?(\.x)?', str))
+    # todo bug
+    return bool(re.search(r'\d+([\.\d+]+)?(\.x)? < \d+([\.\d+]+)? < \d+([\.\d+]+)?(\.x)?', str))
 
 
 def get_num_version(software_name, description):
@@ -162,14 +163,10 @@ def is_lte_with_comparator_x(num_version, software_name, description):
 def is_in_version_range(num_version, software_name, description):
     software_name = software_name.upper()
     description = description.upper()
-    regex = re.search(
-        software_name + r' (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+) < (\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)',
-        description)
+    regex = re.search(software_name + r' \d+([\.\d+]+)? < \d+([\.\d+]+)?', description)
     try:
         software = regex.group(0)
-        regex = re.search(
-            r'(?P<from_version>(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+)) < (?P<to_version>(\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+|\d+\.\d+|\d+))',
-            software)
+        regex = re.search(r'(?P<from_version>\d+([\.\d+]+)?) < (?P<to_version>\d+([\.\d+]+)?)', software)
         if parse_version(num_version) >= parse_version(regex.group('from_version')) and parse_version(
                 num_version) <= parse_version(regex.group('to_version')):
             return True
